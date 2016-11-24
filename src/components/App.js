@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import axios from "axios";
 
-import logo from '../img/rit.png';
+import Header from "./header";
+import News from "./news";
+
 import '../styles/App.css';
 
 class App extends Component {
@@ -17,46 +19,24 @@ class App extends Component {
     this.getHackerNewsData();
   }
   getHackerNewsData() {
-    const self = this;
     axios.get("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty")
-    .then(function (response) {
-      self.getSingleNews(response.data)
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    .then( response => this.getSingleNews(response.data))
   }
   getSingleNews(news) {
-    const self = this;
     news.forEach(n => {
       axios.get(`https://hacker-news.firebaseio.com/v0/item/${n}.json?print=pretty`)
-      .then(function (response) {
-        const hackernews = self.state.hackernews;
+      .then( response => {
+        const hackernews = this.state.hackernews;
         hackernews.push(response.data);
-        self.setState({ hackernews });
+        this.setState({ hackernews });
       })
-      .catch(function (error) {
-        console.log(error);
-      });
     })
-  }
-  renderItem(news) {
-    return (<a key={news.id} href={news.url} className="list-group-item" target="_blank">
-      <h4 className="list-group-item-heading">{news.title}</h4>
-    </a>);
   }
   render() {
     return (
       <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Hacker news feed</h2>
-        </div>
-        <div className="container">
-          <div className="list-group">
-            {this.state.hackernews.map(this.renderItem)}
-          </div>
-        </div>
+        <Header />
+        <News news={this.state.hackernews}/>
       </div>
     );
   }
